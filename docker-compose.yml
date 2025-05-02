@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  loadbalancer:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data
+    dns:
+      - 8.8.8.8
+    extra_hosts:
+      - "backend1:172.20.0.2"
+      - "backend2:172.20.0.3"
+      - "backend3:172.20.0.4"
+    depends_on:
+      - backend1
+      - backend2
+      - backend3
+    networks:
+      lb_network:
+        ipv4_address: 172.20.0.5
+
+  backend1:
+    image: hashicorp/http-echo
+    command: -text="Hello from Backend 1" -listen=:8081
+    networks:
+      lb_network:
+        ipv4_address: 172.20.0.2
+
+  backend2:
+    image: hashicorp/http-echo
+    command: -text="Hello from Backend 2" -listen=:8082
+    networks:
+      lb_network:
+        ipv4_address: 172.20.0.3
+
+  backend3:
+    image: hashicorp/http-echo
+    command: -text="Hello from Backend 3" -listen=:8083
+    networks:
+      lb_network:
+        ipv4_address: 172.20.0.4
+
+networks:
+  lb_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+          gateway: 172.20.0.1

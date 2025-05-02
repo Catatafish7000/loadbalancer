@@ -1,0 +1,10 @@
+port: "8080"
+backends:
+  - "http://backend1:8081"
+  - "http://backend2:8082"
+  - "http://backend3:8083"
+
+ratelimit:
+  capacity: 10
+  rate_per_sec: 1
+  storage_path: "/app/data/ratelimit.json"  
